@@ -11,9 +11,9 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   keyTimes = [], // list of milisecond times of lettersPressed.
   LENGTH = 5; // after typing how many keys mouse will be moved from front (set mouse position)
 
-let _setCursor, _cleanClip, _controlVolume;
+let _setCursor, _cleanClip, _maintainClip, _controlVolume;
 
-// Keep a global reference of the window object, if you don"t, the window will
+// Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
@@ -56,34 +56,54 @@ app.on("window-all-closed", function () {
 })
 
 app.on("activate", function () {
-  // On macOS it"s common to re-create a window in the app when the
+  // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
 });
 
-// In this file you can include the rest of your app"s specific main process
+// In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on(KEYS.SET_CURSOR, function (_, arg) { _setCursor = arg; });
-ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClip = arg; });
-ipcMain.on(KEYS.CONTROL_VOLUME, function (_, arg) { _controlVolume = arg; });
+ipcMain.on(KEYS.SET_CURSOR, function (_, arg) { _setCursor = arg; checkAndToggle(); });
+ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClip = arg; checkAndToggle(); });
+ipcMain.on(KEYS.CONTROL_VOLUME, function (_, arg) { _controlVolume = arg; checkAndToggle(); });
+ipcMain.on(KEYS.MAINTAIN_CLIPBOARD, function (_, arg) { _maintainClip = arg; checkAndToggle(); });
 
-// // https://www.npmjs.com/package/electron-clipboard-extended
-// clipboard.on("text-changed", function () {
-// }).startWatching();
-
-ioHook.on("keyup", function (e) {
-  // { shiftKey: false, altKey: false, ctrlKey: false, metaKey: false, keycode: 61010, rawcode: 45, type: "keyup" }
-
-  if (_cleanClip && e.ctrlKey && e.rawcode == 67) {
-    // if ctrl + c is pressed
-    let clipText = clipElectron.readText("clipboard");
-    if (clipText.trim().indexOf("mis ") == 0) { // must be in start with a space
-      clipText = clipText.replace(/[^a-zA-Z0-9]+/g, " ").trim().replace("mis ", "");
-      clipElectron.writeText(clipText, "clipboard");
-      mainWindow.webContents.send(KEYS.SET_NEW_CLIP, clipText);
-    }
+function checkAndToggle() {
+  if (_setCursor) {
+    ioHook.on("keyup", setCursor);
   }
+
+  if (_controlVolume) {
+    ioHook.on("keydown", controlVolume);
+  }
+
+  if (_setCursor || _controlVolume) {
+    ioHook.start();
+  } else {
+    ioHook.stop();
+  }
+
+  if (_cleanClip || _maintainClip) {
+    clipExtended.on("text-changed", maintainClipboard).startWatching();
+  } else {
+    clipExtended.off("text-changed");
+  }
+}
+
+function maintainClipboard() {
+  // https://www.npmjs.com/package/electron-clipboard-extended
+  let clipText = clipElectron.readText("clipboard");
+  if (_cleanClip && clipText.trim().indexOf("mis ") == 0) { // must be in start with a space
+    clipText = clipText.replace(/[^a-zA-Z0-9]+/g, " ").trim().replace("mis ", "");
+  }
+  console.log(clipText);
+  clipElectron.writeText(clipText, "clipboard");
+  mainWindow.webContents.send(KEYS.SET_NEW_CLIP, clipText);
+}
+
+function setCursor(e) {
+  // { shiftKey: false, altKey: false, ctrlKey: false, metaKey: false, keycode: 61010, rawcode: 45, type: "keyup" }
 
   if (_setCursor && e.rawcode > 64 & e.rawcode < 91) {
 
@@ -114,16 +134,16 @@ ioHook.on("keyup", function (e) {
       robot.moveMouse(0, 0);
     }
   }
+};
 
+function controlVolume(e) {
   if (_controlVolume && e.shiftKey && e.ctrlKey && e.altKey) {
-    if (e.rawcode == 38) { // volume up
+    if (e.rawcode == 38) { // up key
       // systemControl.audio.getSystemVolume().then(console.log);
       winAudio.speaker.set(Math.round((winAudio.speaker.get() + 10) / 10) * 10);
     }
-    if (e.rawcode == 40) { // volume down
+    if (e.rawcode == 40) { // down key
       winAudio.speaker.set(Math.round((winAudio.speaker.get() - 10) / 10) * 10);
     }
   }
-});
-ioHook.start();
-// ioHook.stop();
+}

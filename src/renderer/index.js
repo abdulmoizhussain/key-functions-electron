@@ -5,7 +5,8 @@ const { ipcRenderer, clipboard } = require("electron"),
   KEYS = require("../js/KEYS.js"),
   setCursorE = document.getElementById("set-cursor"),
   cleanClipE = document.getElementById("clean-clipboard"),
-  controlVolE = document.getElementById("control-volume");
+  controlVolE = document.getElementById("control-volume"),
+  maintainClipE = document.getElementById("maintain-clipboard");
 
 setCursorE.addEventListener("click", function () {
   ipcRenderer.send(KEYS.SET_CURSOR, setCursorE.checked);
@@ -22,12 +23,15 @@ cleanClipE.addEventListener("click", function () {
         <i class="fa fa-copy"></i>
       </button>
       &nbsp;&nbsp;
-      ${arg.substr(0, 45)}
-      <span class="text-24">...</span><br>` + clipBoardE.innerHTML;
+      ${arg.length > 45 ? arg.substr(0, 45) + "<span class='text-24'>...</span>" : arg}<br>` + clipBoardE.innerHTML;
 
   });
 }, false);
 
 controlVolE.addEventListener("click", function () {
   ipcRenderer.send(KEYS.CONTROL_VOLUME, controlVolE.checked);
+}, false);
+
+maintainClipE.addEventListener("click", function () {
+  ipcRenderer.send(KEYS.MAINTAIN_CLIPBOARD, maintainClipE.checked);
 }, false);

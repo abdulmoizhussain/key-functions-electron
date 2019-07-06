@@ -1,0 +1,80 @@
+https://electronjs.org/docs/api/ipc-main
+
+https://www.npmjs.com/package/win-audio
+
+https://www.npmjs.com/package/system-control
+
+https://stackoverflow.com/questions/31130150/in-electron-framework-can-i-access-clipboard
+
+https://github.com/octalmage/robotjs/wiki/Electron
+
+https://github.com/sidharth0094/robotjs
+
+https://github.com/octalmage/robotjs/issues/486
+
+https://nodejs.org/en/download/releases/
+
+https://github.com/octalmage/robotjs/issues/486
+
+https://stackoverflow.com/questions/11178372/is-it-possible-to-simulate-keyboard-mouse-event-in-nodejs
+
+https://wilix-team.github.io/iohook/usage.html
+
+http://getrobot.net/docs/node.html
+
+https://www.npmjs.com/package/iohook
+
+https://nodejs.org/en/download/releases/
+
+https://wilix-team.github.io/iohook/installation.html
+
+https://electronjs.org/releases/stable?version=2
+
+https://github.com/octalmage/robotjs/releases/tag/v0.5.1
+
+https://www.npmjs.com/package/electron-abi
+
+
+Node 10.0.0
+"electron": "2.0.18"
+"robotjs": "^0.5.1"
+
+// for robotjs to build after npm i
+npm rebuild --runtime=electron --target=2.0.18 --disturl=https://atom.io/download/atom-shell --abi=64
+
+// https://github.com/Streampunk/naudiodon/issues/12
+// for win-audio to build after npm i
+node_modules\.bin\electron-rebuild
+
+{
+  "name": "key-functions",
+  "version": "1.0.0",
+  "description": "A minimal Electron application",
+ "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "2.0.18",
+    "iohook": "^0.5.0",
+    "node-abi": "^2.9.0"
+  },
+  "devDependencies": {
+    "robotjs": "^0.5.1"
+  },
+  "iohook": {
+    "targets": [
+      "node-64",
+      "electron-57"
+    ],
+    "platforms": [
+      "win32",
+      "darwin",
+      "linux"
+    ],
+    "arches": [
+      "x64",
+      "ia32"
+    ]
+  }
+}

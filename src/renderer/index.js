@@ -42,7 +42,6 @@ function checkAndToggle() {
   }
 }
 
-
 function addNewClipListener(_, arg) {
   if (clipHistory.includes(arg)) {
     return;
@@ -50,9 +49,12 @@ function addNewClipListener(_, arg) {
   clipHistory.push(arg);
   const clipBoardE = document.getElementById("clipboard-history");
   clipBoardE.innerHTML =
-    `<button style="font-size:12px" onclick="setClip('${clipHistory.length - 1}')"><i class="fa fa-copy"></i></button>
-      &nbsp;&nbsp;
-      ${arg.length > 45 ? arg.substr(0, 45) + "<span class='text-24'>...</span>" : arg}<br>` + clipBoardE.innerHTML;
+    `<div>
+      <button style="font-size:12px" onclick="setClip('${clipHistory.length - 1}')">
+        <i class="fa fa-copy"></i>
+      </button>
+      &nbsp;&nbsp;${arg.length > 45 ? arg.substr(0, 45) + "...." : arg}
+    </div>` + clipBoardE.innerHTML;
 }
 
 function setClip(index) {

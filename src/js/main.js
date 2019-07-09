@@ -11,7 +11,7 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   keyTimes = [], // list of milisecond times of lettersPressed.
   LENGTH = 5; // after typing how many keys mouse will be moved from front (set mouse position)
 
-let _setCursor, _cleanClip, _maintainClip, _controlVolume;
+let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -64,37 +64,54 @@ app.on("activate", function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on(KEYS.SET_CURSOR, function (_, arg) { _setCursor = arg; checkAndToggle(); });
-ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClip = arg; checkAndToggle(); });
-ipcMain.on(KEYS.CONTROL_VOLUME, function (_, arg) { _controlVolume = arg; checkAndToggle(); });
-ipcMain.on(KEYS.MAINTAIN_CLIPBOARD, function (_, arg) { _maintainClip = arg; checkAndToggle(); });
+ipcMain.on(KEYS.SET_CURSOR, function (_, arg) { _setCursorButton = arg; checkAndToggle(); });
+ipcMain.on(KEYS.CONTROL_VOLUME, function (_, arg) { _controlVolumeButton = arg; checkAndToggle(); });
+ipcMain.on(KEYS.MAINTAIN_CLIPBOARD, function (_, arg) { _maintainClipButton = arg; checkAndToggle(); });
+ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClipButton = arg; checkAndToggle(); });
 
 function checkAndToggle() {
-  if (_setCursor) {
-    ioHook.on("keyup", setCursor);
+  if (_setCursorButton || _cleanClipButton || _maintainClipButton) {
+    if (!_keyUpListenerState) {
+      ioHook.on("keyup", keyUpListener);
+      _keyUpListenerState = true;
+    }
   }
 
-  if (_controlVolume) {
-    ioHook.on("keydown", controlVolume);
+  if (_controlVolumeButton) {
+    if (!_keyDownListenerState) {
+      ioHook.on("keydown", KeyDownListener);
+      _keyDownListenerState = true;
+    }
+  } else {
+    _keyDownListenerState = false;
   }
 
-  if (_setCursor || _controlVolume) {
+  if (_setCursorButton || _controlVolumeButton || _cleanClipButton || _maintainClipButton) {
     ioHook.start();
   } else {
     ioHook.stop();
+    _keyUpListenerState = false;
   }
 
-  if (_cleanClip || _maintainClip) {
-    clipExtended.on("text-changed", maintainClipboard).startWatching();
-  } else {
-    clipExtended.off("text-changed");
-  }
+  // console.log(clipExtended.availableFormats());
+  // console.log(clipExtended.has("text/plain", "clipboard"));
+  // if (_cleanClipButton || _maintainClipButton) {
+  //   if (!_clipListenerState) {
+  //     clipExtended.on("text-changed", maintainClipboard);
+  //     clipExtended.startWatching();
+  //     _clipListenerState = true;
+  //   }
+  // } else {
+  //   clipExtended.off("text-changed");
+  //   clipExtended.stopWatching();
+  //   _clipListenerState = false;
+  // }
 }
 
 function maintainClipboard() {
-  // https://www.npmjs.com/package/electron-clipboard-extended
+  // mis https://www.npmjs.com/package/electron-clipboard-extended
   let clipText = clipElectron.readText("clipboard");
-  if (_cleanClip && clipText.trim().indexOf("mis ") == 0) { // must be in start with a space
+  if (_cleanClipButton && clipText.trim().indexOf("mis ") == 0) { // must be in start with a space
     clipText = clipText.replace(/[^a-zA-Z0-9]+/g, " ").trim().replace("mis ", "");
   }
   console.log(clipText);
@@ -102,10 +119,10 @@ function maintainClipboard() {
   mainWindow.webContents.send(KEYS.SET_NEW_CLIP, clipText);
 }
 
-function setCursor(e) {
+function keyUpListener(e) {
   // { shiftKey: false, altKey: false, ctrlKey: false, metaKey: false, keycode: 61010, rawcode: 45, type: "keyup" }
 
-  if (_setCursor && e.rawcode > 64 & e.rawcode < 91) {
+  if (_setCursorButton && e.rawcode > 64 & e.rawcode < 91) {
 
     if (lettersPressed.length === LENGTH) {
       lettersPressed.shift();
@@ -136,14 +153,16 @@ function setCursor(e) {
   }
 };
 
-function controlVolume(e) {
-  if (_controlVolume && e.shiftKey && e.ctrlKey && e.altKey) {
+function KeyDownListener(e) {
+  if (_controlVolumeButton && e.shiftKey && e.ctrlKey && e.altKey) {
     if (e.rawcode == 38) { // up key
       // systemControl.audio.getSystemVolume().then(console.log);
-      winAudio.speaker.set(Math.round((winAudio.speaker.get() + 10) / 10) * 10);
+      // winAudio.speaker.set(Math.round((winAudio.speaker.get() + 10) / 10) * 10);
+      winAudio.speaker.set(winAudio.speaker.get() + 10);
     }
     if (e.rawcode == 40) { // down key
-      winAudio.speaker.set(Math.round((winAudio.speaker.get() - 10) / 10) * 10);
+      // winAudio.speaker.set(Math.round((winAudio.speaker.get() - 10) / 10) * 10);
+      winAudio.speaker.set(winAudio.speaker.get() - 10);
     }
   }
 }

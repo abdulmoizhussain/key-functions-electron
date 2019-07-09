@@ -11,7 +11,7 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   keyTimes = [], // list of milisecond times of lettersPressed.
   LENGTH = 5; // after typing how many keys mouse will be moved from front (set mouse position)
 
-let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState;
+let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState, _clipListenerState;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -70,7 +70,7 @@ ipcMain.on(KEYS.MAINTAIN_CLIPBOARD, function (_, arg) { _maintainClipButton = ar
 ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClipButton = arg; checkAndToggle(); });
 
 function checkAndToggle() {
-  if (_setCursorButton || _cleanClipButton || _maintainClipButton) {
+  if (_setCursorButton) {
     if (!_keyUpListenerState) {
       ioHook.on("keyup", keyUpListener);
       _keyUpListenerState = true;
@@ -86,35 +86,36 @@ function checkAndToggle() {
     _keyDownListenerState = false;
   }
 
-  if (_setCursorButton || _controlVolumeButton || _cleanClipButton || _maintainClipButton) {
+  if (_setCursorButton || _controlVolumeButton) {
     ioHook.start();
   } else {
     ioHook.stop();
     _keyUpListenerState = false;
   }
 
-  // console.log(clipExtended.availableFormats());
-  // console.log(clipExtended.has("text/plain", "clipboard"));
-  // if (_cleanClipButton || _maintainClipButton) {
-  //   if (!_clipListenerState) {
-  //     clipExtended.on("text-changed", maintainClipboard);
-  //     clipExtended.startWatching();
-  //     _clipListenerState = true;
-  //   }
-  // } else {
-  //   clipExtended.off("text-changed");
-  //   clipExtended.stopWatching();
-  //   _clipListenerState = false;
-  // }
+  if (_cleanClipButton || _maintainClipButton) {
+    if (!_clipListenerState) {
+      clipExtended.on("text-changed", maintainClipboard);
+      clipExtended.startWatching();
+      _clipListenerState = true;
+    }
+  } else {
+    clipExtended.off("text-changed");
+    clipExtended.stopWatching();
+    _clipListenerState = false;
+  }
 }
 
 function maintainClipboard() {
   // mis https://www.npmjs.com/package/electron-clipboard-extended
   let clipText = clipElectron.readText("clipboard");
-  if (_cleanClipButton && clipText.trim().indexOf("mis ") == 0) { // must be in start with a space
-    clipText = clipText.replace(/[^a-zA-Z0-9]+/g, " ").trim().replace("mis ", "");
+  if (_cleanClipButton) {
+    if (clipText.trim().substr(0, 4).toLowerCase() == "mis ") { // must be in start with a space
+      clipText = clipText.replace(/[^a-zA-Z0-9]+/g, " ").trim().replace("mis ", "");
+    } else if (!_maintainClipButton) {
+      return;
+    }
   }
-  console.log(clipText);
   clipElectron.writeText(clipText, "clipboard");
   mainWindow.webContents.send(KEYS.SET_NEW_CLIP, clipText);
 }

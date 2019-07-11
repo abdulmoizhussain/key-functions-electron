@@ -75,6 +75,9 @@ function checkAndToggle() {
       ioHook.on("keyup", keyUpListener);
       _keyUpListenerState = true;
     }
+  } else {
+    ioHook.removeListener("keyup", keyUpListener);
+    _keyUpListenerState = false;
   }
 
   if (_controlVolumeButton) {
@@ -83,6 +86,7 @@ function checkAndToggle() {
       _keyDownListenerState = true;
     }
   } else {
+    ioHook.removeListener("keydown", KeyDownListener);
     _keyDownListenerState = false;
   }
 
@@ -90,7 +94,7 @@ function checkAndToggle() {
     ioHook.start();
   } else {
     ioHook.stop();
-    _keyUpListenerState = false;
+    // _keyUpListenerState = false;
   }
 
   if (_cleanClipButton || _maintainClipButton) {
@@ -125,7 +129,7 @@ function keyUpListener(e) {
 
   if (_setCursorButton && e.rawcode > 64 & e.rawcode < 91) {
 
-    if (lettersPressed.length === LENGTH) {
+    if (lettersPressed.length == LENGTH) {
       lettersPressed.shift();
     }
     lettersPressed.push(String.fromCharCode(e.rawcode));
@@ -136,7 +140,7 @@ function keyUpListener(e) {
       return;
     }
 
-    if (keyTimes.length === LENGTH) {
+    if (keyTimes.length == LENGTH) {
       keyTimes.shift();
     }
     keyTimes.push(new Date().getTime());
@@ -155,6 +159,7 @@ function keyUpListener(e) {
 };
 
 function KeyDownListener(e) {
+  // { amount: 3, clicks: 1, direction: 3, rotation: 1, type: 'mousewheel', x: 466, y: 683 }
   if (_controlVolumeButton && e.shiftKey && e.ctrlKey && e.altKey) {
     if (e.rawcode == 38) { // up key
       // systemControl.audio.getSystemVolume().then(console.log);

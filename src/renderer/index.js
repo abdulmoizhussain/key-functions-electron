@@ -2,7 +2,7 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 const { ipcRenderer, clipboard } = require("electron"),
-  KEYS = require("../js/KEYS.js"),
+  KEYS = require("../main/KEYS.js"),
   setCursorE = document.getElementById("set-cursor"),
   cleanClipE = document.getElementById("clean-clipboard"),
   controlVolE = document.getElementById("control-volume"),
@@ -42,7 +42,7 @@ function checkAndToggle() {
   }
 }
 
-function addNewClipListener(_, arg) {
+function addNewClipListener(_, arg = "") {
   if (clipHistory.includes(arg)) {
     return;
   }
@@ -53,8 +53,18 @@ function addNewClipListener(_, arg) {
       <button style="font-size:12px" onclick="setClip('${clipHistory.length - 1}')">
         <i class="fa fa-copy"></i>
       </button>
-      &nbsp;&nbsp;${arg.length > 45 ? arg.substr(0, 45) + "...." : arg}
+      &nbsp;&nbsp;${arg.length > 45 ? escHtml(arg.substr(0, 45)) + "...." : escHtml(arg)}
     </div>` + clipBoardE.innerHTML;
+
+  // https://stackoverflow.com/questions/6234773/can-i-escape-html-special-chars-in-javascript
+  function escHtml(htm = "") {
+    return htm
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 }
 
 function setClip(index) {

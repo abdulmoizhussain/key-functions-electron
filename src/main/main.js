@@ -9,9 +9,10 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   winAudio = require("win-audio"),
   lettersPressed = [], // list of letters/alphabets pressed
   keyTimes = [], // list of milisecond times of lettersPressed.
+  images = [],
   LENGTH = 5; // after typing how many keys mouse will be moved from front (set mouse position)
 
-let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState, _clipListenerState;
+let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState, _clipListenerState, _imageListenerState;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -82,11 +83,11 @@ function checkAndToggle() {
 
   if (_controlVolumeButton) {
     if (!_keyDownListenerState) {
-      ioHook.on("keydown", KeyDownListener);
+      ioHook.on("keydown", keyDownListener);
       _keyDownListenerState = true;
     }
   } else {
-    ioHook.removeListener("keydown", KeyDownListener);
+    ioHook.removeListener("keydown", keyDownListener);
     _keyDownListenerState = false;
   }
 
@@ -99,18 +100,42 @@ function checkAndToggle() {
 
   if (_cleanClipButton || _maintainClipButton) {
     if (!_clipListenerState) {
-      clipExtended.on("text-changed", maintainClipboard);
+      clipExtended.on("text-changed", manageTextChange);
       clipExtended.startWatching();
       _clipListenerState = true;
     }
+    if (_maintainClipButton) {
+      if (!_imageListenerState) {
+        clipExtended.on("image-changed", manageImageChange);
+        clipExtended.startWatching();
+        _imageListenerState = true;
+      }
+    } else {
+      clipExtended.off("image-changed", manageImageChange);
+      clipExtended.stopWatching();
+      _imageListenerState = false;
+    }
   } else {
-    clipExtended.off("text-changed");
+    clipExtended.off("text-changed", manageTextChange);
     clipExtended.stopWatching();
-    _clipListenerState = false;
+    _imageListenerState = _clipListenerState = false;
   }
 }
 
-function maintainClipboard() {
+function manageImageChange() {
+  const image = clipElectron.readImage("clipboard");
+  const icon = image.resize({ width: 16, height: 16 }).toDataURL();
+  if (!images.filter(i => i.icon == icon).length) {
+    images.push({ image, icon });
+    mainWindow.webContents.send(KEYS.NEW_CLIP, {
+      index: images.length - 1,
+      icon,
+      title: image.resize({ width: 128, height: 128 }).toDataURL(),
+    });
+  }
+}
+
+function manageTextChange() {
   // mis https://www.npmjs.com/package/electron-clipboard-extended
   let clipText = clipElectron.readText("clipboard");
   if (_cleanClipButton) {
@@ -121,7 +146,7 @@ function maintainClipboard() {
     }
   }
   clipElectron.writeText(clipText, "clipboard");
-  mainWindow.webContents.send(KEYS.SET_NEW_CLIP, clipText);
+  mainWindow.webContents.send(KEYS.NEW_CLIP, clipText);
 }
 
 function keyUpListener(e) {
@@ -158,7 +183,7 @@ function keyUpListener(e) {
   }
 };
 
-function KeyDownListener(e) {
+function keyDownListener(e) {
   // { amount: 3, clicks: 1, direction: 3, rotation: 1, type: 'mousewheel', x: 466, y: 683 }
   if (_controlVolumeButton && e.shiftKey && e.ctrlKey && e.altKey) {
     if (e.rawcode == 38) { // up key
@@ -172,3 +197,11 @@ function KeyDownListener(e) {
     }
   }
 }
+
+ipcMain.on(KEYS.SET_CLIP, function (_, indexOrText) {
+  if (typeof indexOrText == "number") { // an image to copy to clipboard
+    clipElectron.writeImage(images[indexOrText].image, "clipboard");
+  } else { // some text to copy to clipboard
+    clipElectron.writeText(indexOrText, "clipboard");
+  }
+});

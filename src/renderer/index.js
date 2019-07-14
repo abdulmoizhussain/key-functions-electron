@@ -1,7 +1,7 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
-const { ipcRenderer, clipboard } = require("electron"),
+const { ipcRenderer } = require("electron"),
   KEYS = require("../main/KEYS.js"),
   setCursorE = document.getElementById("set-cursor"),
   cleanClipE = document.getElementById("clean-clipboard"),
@@ -33,11 +33,11 @@ maintainClipE.addEventListener("click", function () {
 function checkAndToggle() {
   if (maintainClipE.checked || cleanClipE.checked) {
     if (!_setNewClipListenerState) {
-      ipcRenderer.on(KEYS.SET_NEW_CLIP, addNewClipListener);
+      ipcRenderer.on(KEYS.NEW_CLIP, addNewClipListener);
       _setNewClipListenerState = true;
     }
   } else {
-    ipcRenderer.removeListener(KEYS.SET_NEW_CLIP, addNewClipListener);
+    ipcRenderer.removeListener(KEYS.NEW_CLIP, addNewClipListener);
     _setNewClipListenerState = false;
   }
 }
@@ -48,13 +48,14 @@ function addNewClipListener(_, arg = "") {
   }
   clipHistory.push(arg);
   const clipBoardE = document.getElementById("clipboard-history");
-  clipBoardE.innerHTML =
-    `<div>
-      <button style="font-size:12px" onclick="setClip('${clipHistory.length - 1}')">
-        <i class="fa fa-copy"></i>
-      </button>
-      &nbsp;&nbsp;${arg.length > 45 ? escHtml(arg.substr(0, 45)) + "...." : escHtml(arg)}
-    </div>` + clipBoardE.innerHTML;
+  clipBoardE.innerHTML = `<div>
+  <button class="button-cp" onclick="copyToClip(${clipHistory.length - 1})"
+  ><i class="fa fa-copy"></i></button>&nbsp;&nbsp;
+    ${typeof arg == "string" ?
+      escHtml(arg.substr(0, 45)) + (arg.length > 45 ? "...." : "")
+      :
+      `Image <img src="${arg.icon}" alt="icon-image" titl>`
+    }</div>` + clipBoardE.innerHTML;
 
   // https://stackoverflow.com/questions/6234773/can-i-escape-html-special-chars-in-javascript
   function escHtml(htm = "") {
@@ -67,6 +68,7 @@ function addNewClipListener(_, arg = "") {
   }
 }
 
-function setClip(index) {
-  clipboard.writeText(clipHistory[parseInt(index)]);
+function copyToClip(index) {
+  const data = clipHistory[parseInt(index)];
+  ipcRenderer.send(KEYS.SET_CLIP, typeof data == "string" ? data : data.index);
 }

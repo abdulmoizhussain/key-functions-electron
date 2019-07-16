@@ -42,6 +42,10 @@ function createWindow() {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  mainWindow.on("minimize", function () {
+    // mainWindow.hide();
+  })
 }
 
 // This method will be called when Electron has finished
@@ -112,7 +116,6 @@ function checkAndToggle() {
       }
     } else {
       clipExtended.off("image-changed", manageImageChange);
-      clipExtended.stopWatching();
       _imageListenerState = false;
     }
   } else {

@@ -5,19 +5,21 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "rebuild": "npm rebuild --runtime=electron --target=2.0.18 --disturl=https://atom.io/download/atom-shell --abi=64"
   },
   "dependencies": {
     "electron-clipboard-extended": "^1.1.1",
     "iohook": "0.4.0",
     "system-control": "0.0.5",
-    "win-audio": "^2.0.2"
+    "win-audio": "^2.0.2",
+    "robotjs": "^0.5.1"
   },
   "devDependencies": {
     "electron": "^2.0.18",
     "electron-builder": "^21.0.15",
-    "electron-rebuild": "^1.8.5",
-    "robotjs": "^0.5.1"
+    "electron-rebuild": "^1.8.5"
   },
   "iohook": {
     "targets": [

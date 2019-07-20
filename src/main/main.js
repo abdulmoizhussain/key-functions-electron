@@ -143,7 +143,11 @@ function manageTextChange() {
   let clipText = clipElectron.readText("clipboard");
   if (_cleanClipButton) {
     if (clipText.trim().substr(0, 4).toLowerCase() == "mis ") { // must be in start with a space
-      clipText = clipText.replace(/[^a-zA-Z0-9]+/g, " ").trim().replace("mis ", "");
+      clipText = clipText
+        .replace(/[^a-zA-Z0-9]+/g, " ")
+        .trim()
+        .replace("mis ", "")
+        .replace("MIS ", "");
     } else if (!_maintainClipButton) {
       return;
     }
@@ -181,7 +185,19 @@ function keyUpListener(e) {
     }
 
     if ((differences.reduce((a, b) => a + b, 0) / differences.length) < 300) {
+      const mousePos = robot.getMousePos();
+      if (!mousePos.x) return;
       robot.moveMouse(0, 0);
+
+      setTimeout(function () {
+        // this time period is necessary, if we attach listener just after mouse movement at (0, 0), the handler will be immediately called, therefore it needs at least 100 miliseconds.
+        ioHook.on("mousemove", handleMouseMove);
+      }, 100);
+
+      function handleMouseMove() {
+        ioHook.removeListener("mousemove", handleMouseMove);
+        robot.moveMouse(mousePos.x, mousePos.y);
+      }
     }
   }
 };

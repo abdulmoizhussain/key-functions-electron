@@ -1,5 +1,9 @@
-# Key Functions
-# <a href="https://drive.google.com/open?id=15QgUQuEK-Qh63yRwi7v4UYU-pOE_0Q25">Download for Windows</a>
+# Key Functions <a href="https://drive.google.com/open?id=15QgUQuEK-Qh63yRwi7v4UYU-pOE_0Q25">Download for Windows</a>
+
+#### * Removes cursor from front while typing.
+#### * Keeps your clipboard's texts or images in memory to be reused later.
+#### * Cleans special characters from clipboard-text to be easily searched at google <a href="https://github.com/abdulmoizhussain/key-functions#clean-special-characters-from-clipboard">(how to use it)</a>.
+#### * Increase/Decrease volume by 10% with `Ctrl + Alt + Shift + Up/Down` keys.
 
 ### Versions used during development are:
 NodeJS -> 10.0.0 <br>

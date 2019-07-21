@@ -6,7 +6,8 @@ const { ipcRenderer } = require("electron"),
   setCursorE = document.getElementById("set-cursor"),
   cleanClipE = document.getElementById("clean-clipboard"),
   controlVolE = document.getElementById("control-volume"),
-  maintainClipE = document.getElementById("maintain-clipboard");
+  maintainClipE = document.getElementById("maintain-clipboard"),
+  clipBoardE = document.getElementById("clipboard-history");
 let _setNewClipListenerState, clipHistory = [];
 
 setCursorE.addEventListener("click", function () {
@@ -47,7 +48,6 @@ function addNewClipListener(_, arg = "") {
     return;
   }
   clipHistory.push(arg);
-  const clipBoardE = document.getElementById("clipboard-history");
   clipBoardE.innerHTML = `<div>
   <button class="button-cp" onclick="copyToClip(${clipHistory.length - 1})"
   ><i class="fa fa-copy"></i></button>&nbsp;&nbsp;

@@ -7,6 +7,7 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   KEYS = require("./KEYS"),
   // systemControl = require("system-control")(),
   winAudio = require("win-audio"),
+  PreventSleep = require("./PreventSleep"),
   lettersPressed = [], // list of letters/alphabets pressed
   keyTimes = [], // list of milisecond times of lettersPressed.
   images = [],
@@ -222,5 +223,15 @@ ipcMain.on(KEYS.SET_CLIP, function (_, indexOrText) {
     clipElectron.writeImage(images[indexOrText].image, "clipboard");
   } else { // some text to copy to clipboard
     clipElectron.writeText(indexOrText, "clipboard");
+  }
+});
+
+let mPreventSleep;
+ipcMain.on(KEYS.PREVENT_SLEEP, function (_, preventSleepSwitch) {
+  if (preventSleepSwitch) {
+    mPreventSleep = new PreventSleep(10);
+    mPreventSleep.start();
+  } else {
+    mPreventSleep = mPreventSleep.stop();
   }
 });

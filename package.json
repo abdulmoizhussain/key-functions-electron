@@ -12,9 +12,9 @@
   "dependencies": {
     "electron-clipboard-extended": "^1.1.1",
     "iohook": "0.4.0",
+    "robotjs": "^0.5.1",
     "system-control": "0.0.5",
-    "win-audio": "^2.0.2",
-    "robotjs": "^0.5.1"
+    "win-audio": "^2.0.2"
   },
   "devDependencies": {
     "electron": "^2.0.18",

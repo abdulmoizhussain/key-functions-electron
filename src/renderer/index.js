@@ -7,6 +7,7 @@ const { ipcRenderer } = require("electron"),
   cleanClipE = document.getElementById("clean-clipboard"),
   controlVolE = document.getElementById("control-volume"),
   maintainClipE = document.getElementById("maintain-clipboard"),
+  preventSleepE = document.getElementById("control-prevent-sleep"),
   clipBoardE = document.getElementById("clipboard-history");
 let _setNewClipListenerState, clipHistory = [];
 
@@ -30,6 +31,9 @@ maintainClipE.addEventListener("click", function () {
   checkAndToggle();
 }, false);
 
+preventSleepE.addEventListener("click", function () {
+  ipcRenderer.send(KEYS.PREVENT_SLEEP, preventSleepE.checked);
+}, false);
 
 function checkAndToggle() {
   if (maintainClipE.checked || cleanClipE.checked) {

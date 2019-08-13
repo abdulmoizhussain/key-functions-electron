@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../css/App.css">
 </head>
 
-<body>  
+<body>
   <input id="set-cursor" type="checkbox">
   <label for="set-cursor">Set cursor position (0, 0) while typing</label>
   <br>
@@ -21,6 +21,12 @@
   <input id="control-volume" type="checkbox">
   <label for="control-volume">Increase/Decrease Volume by 10% with Ctrl+Alt+Shift + Up/Down</label>
   <br>
+  <input id="control-prevent-sleep" type="checkbox">
+  <label for="control-prevent-sleep"
+    title="Make sure your system's sleep/lock-screen time is greater than or equal to 10 minutes.">
+    Prevent OS to sleep</label>
+  <br>
+
   <div id="clipboard-history"></div>
 
   <script src="index.js"></script>

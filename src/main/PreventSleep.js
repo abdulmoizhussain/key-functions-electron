@@ -30,10 +30,9 @@ module.exports = class PreventSleep {
       }
       console.log("change");
       // when x is already at 0 pixel.
-      robot.moveMouse(lastPosition.x == 0 ? 1 : 0, lastPosition.y);
+      robot.moveMouseSmooth(lastPosition.x == 0 ? 1 : 0, lastPosition.y);
       // now move back to previous pixel, leaving pointer's position visually unchanged.
-      robot.moveMouse(lastPosition.x, lastPosition.y);
-
+      setTimeout(() => { robot.moveMouseSmooth(lastPosition.x, lastPosition.y); }, 2000);
     }, this.intervalSeconds);
   }
 

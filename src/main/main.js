@@ -227,9 +227,10 @@ ipcMain.on(KEYS.SET_CLIP, function (_, indexOrText) {
 });
 
 let mPreventSleep;
-ipcMain.on(KEYS.PREVENT_SLEEP, function (_, preventSleepSwitch) {
+ipcMain.on(KEYS.PREVENT_SLEEP, function (_, preventSleepSwitch, preventSleepTime) {
   if (preventSleepSwitch) {
-    mPreventSleep = new PreventSleep(10);
+    let timeInMinutes = parseInt(preventSleepTime) || 10;
+    mPreventSleep = new PreventSleep(timeInMinutes);
     mPreventSleep.start();
   } else {
     mPreventSleep = mPreventSleep.stop();

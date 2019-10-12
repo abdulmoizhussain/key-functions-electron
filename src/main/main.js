@@ -76,6 +76,8 @@ ipcMain.on(KEYS.MAINTAIN_CLIPBOARD, function (_, arg) { _maintainClipButton = ar
 ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClipButton = arg; checkAndToggle(); });
 
 function checkAndToggle() {
+  
+  // SET_CURSOR
   if (_setCursorButton) {
     if (!_keyUpListenerState) {
       ioHook.on("keyup", keyUpListener);
@@ -86,6 +88,7 @@ function checkAndToggle() {
     _keyUpListenerState = false;
   }
 
+  // CONTROL_VOLUME
   if (_controlVolumeButton) {
     if (!_keyDownListenerState) {
       ioHook.on("keydown", keyDownListener);
@@ -103,6 +106,8 @@ function checkAndToggle() {
     // _keyUpListenerState = false;
   }
 
+  // CLEAN_CLIPBOARD
+  // MAINTAIN_CLIPBOARD
   if (_cleanClipButton || _maintainClipButton) {
     if (!_clipListenerState) {
       clipExtended.on("text-changed", manageTextChange);
@@ -193,10 +198,12 @@ function keyUpListener(e) {
       setTimeout(function () {
         // this time period is necessary, if we attach listener just after mouse movement at (0, 0), the handler will be immediately called, therefore it needs at least 100 miliseconds.
         ioHook.on("mousemove", handleMouseMove);
+        ioHook.on("mousedown", handleMouseMove);
       }, 100);
 
       function handleMouseMove() {
         ioHook.removeListener("mousemove", handleMouseMove);
+        ioHook.removeListener("mousedown", handleMouseMove);
         robot.moveMouse(mousePos.x, mousePos.y);
       }
     }

@@ -1,0 +1,3 @@
+On forward/backward: CurrentTime - (BackwardTime) - SkipDuration(if there is any during this time).
+Option to pin/unpin control-menu.
+Add releases.

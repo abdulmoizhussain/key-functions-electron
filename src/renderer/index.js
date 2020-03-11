@@ -2,7 +2,7 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 const { ipcRenderer, screen } = require("electron"),
-  KEYS = require("../main/KEYS.js"),
+  KEYS = require("../common/constants"),
   setCursorOptions = require("./set_cursor_options.js"),
   setCursorE = document.getElementById("set_cursor"),
   cleanClipE = document.getElementById("clean-clipboard"),
@@ -19,6 +19,8 @@ document.getElementById("set_cursor_options").innerHTML = setCursorOptions(KEYS.
 
 setCursorE.addEventListener("click", function () {
   const setCursorElements = document.getElementsByName("set_cursor");
+  let cursorPosition = KEYS.CURSOR_POSITIONS.TOP_LEFT;
+
   for (let i = 0, len = setCursorElements.length; i < len; i++) {
     const setCursorElement = setCursorElements[i];
     if (setCursorElement.checked) {
@@ -26,7 +28,7 @@ setCursorE.addEventListener("click", function () {
     }
   }
 
-  ipcRenderer.send(KEYS.SET_CURSOR, { setCursorE.checked, position:  });
+  // ipcRenderer.send(KEYS.SET_CURSOR, { setCursorE.checked, position:  });
 }, false);
 
 

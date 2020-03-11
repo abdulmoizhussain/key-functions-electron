@@ -1,9 +1,10 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
-const { ipcRenderer } = require("electron"),
+const { ipcRenderer, screen } = require("electron"),
   KEYS = require("../main/KEYS.js"),
-  setCursorE = document.getElementById("set-cursor"),
+  setCursorOptions = require("./set_cursor_options.js"),
+  setCursorE = document.getElementById("set_cursor"),
   cleanClipE = document.getElementById("clean-clipboard"),
   controlVolE = document.getElementById("control-volume"),
   maintainClipE = document.getElementById("maintain-clipboard"),
@@ -12,8 +13,20 @@ const { ipcRenderer } = require("electron"),
   clipBoardE = document.getElementById("clipboard-history");
 let _setNewClipListenerState, clipHistory = [];
 
+// console.log(screen.getAllDisplays().map(d => d));
+
+document.getElementById("set_cursor_options").innerHTML = setCursorOptions(KEYS.CURSOR_POSITIONS);
+
 setCursorE.addEventListener("click", function () {
-  ipcRenderer.send(KEYS.SET_CURSOR, setCursorE.checked);
+  const setCursorElements = document.getElementsByName("set_cursor");
+  for (let i = 0, len = setCursorElements.length; i < len; i++) {
+    const setCursorElement = setCursorElements[i];
+    if (setCursorElement.checked) {
+      break;
+    }
+  }
+
+  ipcRenderer.send(KEYS.SET_CURSOR, { setCursorE.checked, position:  });
 }, false);
 
 

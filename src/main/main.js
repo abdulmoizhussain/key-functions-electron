@@ -30,6 +30,8 @@ function createWindow() {
     }
   });
 
+  // robot.moveMouse(1366 -1, 100);
+
   // and load the index.html of the app.
   mainWindow.loadFile("src/renderer/index.html");
 
@@ -76,7 +78,7 @@ ipcMain.on(KEYS.MAINTAIN_CLIPBOARD, function (_, arg) { _maintainClipButton = ar
 ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClipButton = arg; checkAndToggle(); });
 
 function checkAndToggle() {
-  
+
   // SET_CURSOR
   if (_setCursorButton) {
     if (!_keyUpListenerState) {
@@ -165,7 +167,9 @@ function manageTextChange() {
 function keyUpListener(e) {
   // { shiftKey: false, altKey: false, ctrlKey: false, metaKey: false, keycode: 61010, rawcode: 45, type: "keyup" }
 
-  if (_setCursorButton && e.rawcode > 64 & e.rawcode < 91) {
+  // stopping only alphabet characters 65 - 90
+  // if (_setCursorButton && e.rawcode > 64 & e.rawcode < 91) {
+  if (_setCursorButton) {
 
     if (lettersPressed.length == LENGTH) {
       lettersPressed.shift();

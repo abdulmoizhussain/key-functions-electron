@@ -5,6 +5,7 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   ioHook = require("iohook"),
   path = require("path"),
   KEYS = require("../common/constants"),
+  ScreenCorners = require("./ScreenCorners"),
   // systemControl = require("system-control")(),
   winAudio = require("win-audio"),
   PreventSleep = require("./PreventSleep"),
@@ -13,24 +14,27 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   images = [],
   LENGTH = 5; // after typing how many keys mouse will be moved from front (set mouse position)
 
-let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState, _clipListenerState, _imageListenerState;
+let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState, _clipListenerState, _imageListenerState, _cursorPosition, _screenCorners;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 function createWindow() {
+  {
+    const { screen } = require("electron");
+    _screenCorners = new ScreenCorners(screen);
+  }
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 640,
-    height: 480,
+    height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true
     }
   });
-
-  // robot.moveMouse(1366 -1, 100);
 
   // and load the index.html of the app.
   mainWindow.loadFile("src/renderer/index.html");
@@ -72,7 +76,11 @@ app.on("activate", function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on(KEYS.SET_CURSOR, function (_, arg) { _setCursorButton = arg; checkAndToggle(); });
+ipcMain.on(KEYS.SET_CURSOR, function (_, arg) {
+  _setCursorButton = arg.setCursor;
+  _cursorPosition = arg.cursorPosition;
+  checkAndToggle();
+});
 ipcMain.on(KEYS.CONTROL_VOLUME, function (_, arg) { _controlVolumeButton = arg; checkAndToggle(); });
 ipcMain.on(KEYS.MAINTAIN_CLIPBOARD, function (_, arg) { _maintainClipButton = arg; checkAndToggle(); });
 ipcMain.on(KEYS.CLEAN_CLIPBOARD, function (_, arg) { _cleanClipButton = arg; checkAndToggle(); });
@@ -171,16 +179,16 @@ function keyUpListener(e) {
   // if (_setCursorButton && e.rawcode > 64 & e.rawcode < 91) {
   if (_setCursorButton) {
 
-    if (lettersPressed.length == LENGTH) {
-      lettersPressed.shift();
-    }
-    lettersPressed.push(String.fromCharCode(e.rawcode));
+    // if (lettersPressed.length == LENGTH) {
+    //   lettersPressed.shift();
+    // }
+    // lettersPressed.push(String.fromCharCode(e.rawcode));
 
     // e.g regex: "a{5,5}" , check if "a" occurs five time in string
     // e.g str to match: asdfg
-    if (RegExp(`${lettersPressed[lettersPressed.length - 1]}{${LENGTH},${LENGTH}}`).test(lettersPressed.join(""))) {
-      return;
-    }
+    // if (RegExp(`${lettersPressed[lettersPressed.length - 1]}{${LENGTH},${LENGTH}}`).test(lettersPressed.join(""))) {
+    //   return;
+    // }
 
     if (keyTimes.length == LENGTH) {
       keyTimes.shift();
@@ -196,8 +204,12 @@ function keyUpListener(e) {
 
     if ((differences.reduce((a, b) => a + b, 0) / differences.length) < 300) {
       const mousePos = robot.getMousePos();
-      if (!mousePos.x) return;
-      robot.moveMouse(0, 0);
+      const cPos = _screenCorners.getPosition(_cursorPosition);
+
+      // if (!mousePos.x) return;
+      if (mousePos.x == cPos.x && mousePos.y == cPos.y) return;
+
+      robot.moveMouse(cPos.x, cPos.y);
 
       setTimeout(function () {
         // this time period is necessary, if we attach listener just after mouse movement at (0, 0), the handler will be immediately called, therefore it needs at least 100 miliseconds.

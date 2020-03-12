@@ -10,25 +10,32 @@ const { ipcRenderer, screen } = require("electron"),
   maintainClipE = document.getElementById("maintain-clipboard"),
   preventSleepE = document.getElementById("control-prevent-sleep"),
   preventSleepTimeE = document.getElementById("control-prevent-sleep-time"),
-  clipBoardE = document.getElementById("clipboard-history");
+  clipBoardE = document.getElementById("clipboard-history"),
+  setCursorOptionsE = document.getElementById("set_cursor_options");
 let _setNewClipListenerState, clipHistory = [];
 
-// console.log(screen.getAllDisplays().map(d => d));
-
-document.getElementById("set_cursor_options").innerHTML = setCursorOptions(KEYS.CURSOR_POSITIONS);
+setCursorOptionsE.innerHTML = setCursorOptions(KEYS.CURSOR_POSITIONS);
 
 setCursorE.addEventListener("click", function () {
   const setCursorElements = document.getElementsByName("set_cursor");
   let cursorPosition = KEYS.CURSOR_POSITIONS.TOP_LEFT;
 
-  for (let i = 0, len = setCursorElements.length; i < len; i++) {
-    const setCursorElement = setCursorElements[i];
-    if (setCursorElement.checked) {
-      break;
+  if (setCursorE.checked) {
+    for (let i = 0, len = setCursorElements.length; i < len; i++) {
+      const setCursorElement = setCursorElements[i];
+      if (setCursorElement.checked) {
+        cursorPosition = setCursorElement.value;
+        break;
+      }
     }
+
+    setCursorOptionsE.classList.add("disabled");
+  }
+  else {
+    setCursorOptionsE.classList.remove("disabled");
   }
 
-  // ipcRenderer.send(KEYS.SET_CURSOR, { setCursorE.checked, position:  });
+  ipcRenderer.send(KEYS.SET_CURSOR, { setCursor: setCursorE.checked, cursorPosition });
 }, false);
 
 

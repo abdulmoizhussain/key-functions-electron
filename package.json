@@ -1,8 +1,13 @@
 {
   "name": "key-functions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimal Electron application",
   "main": "src/main/main.js",
+  "author": {
+    "email": "moizhus123@gmail.com",
+    "name": "Abdul Moiz",
+    "url": "https://abdulmoizhussain.github.io"
+  },
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",

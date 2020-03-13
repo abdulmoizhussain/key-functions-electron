@@ -1,6 +1,6 @@
 {
   "name": "key-functions",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A minimal Electron application",
   "main": "src/main/main.js",
   "author": {
@@ -24,7 +24,7 @@
   "devDependencies": {
     "electron": "^2.0.18",
     "electron-builder": "^21.0.15",
-    "electron-rebuild": "^1.8.5"
+    "electron-rebuild not required if you use electron-builder": "'electron-rebuild': '^1.8.5'"
   },
   "iohook": {
     "targets": [

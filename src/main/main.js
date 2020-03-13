@@ -14,6 +14,7 @@ const { app, BrowserWindow, ipcMain, clipboard: clipElectron } = require("electr
   images = [],
   LENGTH = 5; // after typing how many keys mouse will be moved from front (set mouse position)
 
+const _keyCodesToExclude = new Set([8, 9, 13, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 91, 92, 93, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 144, 145, 160, 161, 162, 163, 164, 165]);
 let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButton, _keyUpListenerState, _keyDownListenerState, _clipListenerState, _imageListenerState, _cursorPosition, _screenCorners;
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -177,8 +178,7 @@ function keyUpListener(e) {
 
   // stopping only alphabet characters 65 - 90
   // if (_setCursorButton && e.rawcode > 64 & e.rawcode < 91) {
-  if (_setCursorButton) {
-
+  if (_setCursorButton && _keyCodesToExclude.has(e.rawcode) == false) {
     // if (lettersPressed.length == LENGTH) {
     //   lettersPressed.shift();
     // }

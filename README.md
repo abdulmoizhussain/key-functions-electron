@@ -1,6 +1,6 @@
-<img src="https://github.com/abdulmoizhussain/key-functions-electron/blob/master/images/key-functions.PNG" alt="thats how i look like">
-
 # Key Functions <a href="https://github.com/abdulmoizhussain/key-functions-electron/releases">Download here</a>
+
+<img src="https://github.com/abdulmoizhussain/key-functions-electron/blob/master/images/key-functions.PNG" alt="thats how i look like">
 
 #### * Removes cursor from front while typing.
 #### * Keeps your clipboard's texts & images in memory to be reused later <a href="https://www.addictivetips.com/windows-tips/view-clipboard-history-on-windows-10/">(like that of windows 10)</a>.

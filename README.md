@@ -1,3 +1,5 @@
+<img src="https://github.com/abdulmoizhussain/key-functions-electron/blob/master/images/key-functions.PNG" alt="thats how i look like">
+
 # Key Functions <a href="https://github.com/abdulmoizhussain/key-functions-electron/releases">Download here</a>
 
 #### * Removes cursor from front while typing.

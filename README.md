@@ -1,7 +1,7 @@
-# Key Functions <a href="https://drive.google.com/open?id=15QgUQuEK-Qh63yRwi7v4UYU-pOE_0Q25">Download for Windows</a>
+# Key Functions <a href="https://github.com/abdulmoizhussain/key-functions-electron/releases">Download the App here</a>
 
 #### * Removes cursor from front while typing.
-#### * Keeps your clipboard's texts & images in memory to be reused later.
+#### * Keeps your clipboard's texts & images in memory to be reused later <a href="https://www.addictivetips.com/windows-tips/view-clipboard-history-on-windows-10/">(like that of windows 10)</a>.
 #### * Cleans special characters from clipboard-text to be easily searched at google <a href="https://github.com/abdulmoizhussain/key-functions#clean-special-characters-from-clipboard">(how to use it)</a>.
 #### * Increase/Decrease volume by 10% with `Ctrl + Alt + Shift + Up/Down` keys.
 

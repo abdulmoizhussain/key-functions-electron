@@ -9,7 +9,7 @@ function _breakAndTurnIntoTitleCase(sentence = "") {
 }
 
 module.exports = function (cursorPositions = {}) {
-  let result = '';
+  let result = "";
   const cursorPositionKeys = Object.keys(cursorPositions);
 
   for (let i = 0, len = cursorPositionKeys.length; i < len; i++) {

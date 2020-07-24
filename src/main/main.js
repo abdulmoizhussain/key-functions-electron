@@ -19,16 +19,13 @@ let _setCursorButton, _cleanClipButton, _maintainClipButton, _controlVolumeButto
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+let _mainWindow;
 
 function createWindow() {
-  {
-    const { screen } = require("electron");
-    _screenCorners = new ScreenCorners(screen);
-  }
+  _screenCorners = new ScreenCorners(require("electron").screen);
 
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  _mainWindow = new BrowserWindow({
     width: 640,
     height: 600,
     webPreferences: {
@@ -38,22 +35,22 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile("src/renderer/index.html");
+  _mainWindow.loadFile("src/renderer/index.html");
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
-  mainWindow.on("closed", function () {
+  _mainWindow.on("closed", function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null;
+    _mainWindow = null;
   });
 
-  mainWindow.on("minimize", function () {
+  _mainWindow.on("minimize", function () {
     // mainWindow.hide();
-  })
+  });
 }
 
 // This method will be called when Electron has finished
@@ -66,12 +63,12 @@ app.on("window-all-closed", function () {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== "darwin") app.quit();
-})
+});
 
 app.on("activate", function () {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow();
+  if (_mainWindow === null) createWindow();
 });
 
 // In this file you can include the rest of your app's specific main process
@@ -119,6 +116,9 @@ function checkAndToggle() {
 
   // CLEAN_CLIPBOARD
   // MAINTAIN_CLIPBOARD
+  console.log("_cleanClipButton || _maintainClipButton", _cleanClipButton || _maintainClipButton);
+  console.log("!_clipListenerState", !_clipListenerState);
+  console.log("_maintainClipButton", _maintainClipButton);
   if (_cleanClipButton || _maintainClipButton) {
     if (!_clipListenerState) {
       clipExtended.on("text-changed", manageTextChange);
@@ -143,11 +143,12 @@ function checkAndToggle() {
 }
 
 function manageImageChange() {
+  console.log("manageImageChange");
   const image = clipElectron.readImage("clipboard");
   const icon = image.resize({ width: 16, height: 16 }).toDataURL();
   if (!images.filter(i => i.icon == icon).length) {
     images.push({ image, icon });
-    mainWindow.webContents.send(KEYS.NEW_CLIP, {
+    _mainWindow.webContents.send(KEYS.NEW_CLIP, {
       index: images.length - 1,
       icon,
       title: image.resize({ width: 128, height: 128 }).toDataURL(),
@@ -156,6 +157,7 @@ function manageImageChange() {
 }
 
 function manageTextChange() {
+  console.log("manageTextChange");
   // mis https://www.npmjs.com/package/electron-clipboard-extended
   let clipText = clipElectron.readText("clipboard");
   if (_cleanClipButton) {
@@ -170,7 +172,7 @@ function manageTextChange() {
     }
   }
   clipElectron.writeText(clipText, "clipboard");
-  mainWindow.webContents.send(KEYS.NEW_CLIP, clipText);
+  _mainWindow.webContents.send(KEYS.NEW_CLIP, clipText);
 }
 
 function keyUpListener(e) {

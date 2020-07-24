@@ -40,4 +40,4 @@ module.exports = class PreventSleep {
     clearInterval(this.intervalId);
     return null;
   }
-}
+};

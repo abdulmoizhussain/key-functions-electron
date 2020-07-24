@@ -77,12 +77,13 @@ function addNewClipListener(_, arg = "") {
   }
   clipHistory.push(arg);
   clipBoardE.innerHTML = `<div>
-  <button class="button-cp" onclick="copyToClip(${clipHistory.length - 1})"
-  ><i class="fa fa-copy"></i></button>&nbsp;&nbsp;
+  <button class="button-cp" onclick="copyToClip(${clipHistory.length - 1})">
+    <i class="fa fa-copy"></i>
+  </button>&nbsp;&nbsp;
     ${typeof arg == "string" ?
       escHtml(arg.substr(0, 45)) + (arg.length > 45 ? "...." : "")
       :
-      `Image <img src="${arg.icon}" alt="icon-image" titl>`
+      `Image <img src="${arg.icon}" alt="clip-image-thumbnail">`
     }</div>` + clipBoardE.innerHTML;
 
   // https://stackoverflow.com/questions/6234773/can-i-escape-html-special-chars-in-javascript

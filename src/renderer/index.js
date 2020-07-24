@@ -1,7 +1,7 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
-const { ipcRenderer, screen } = require("electron"),
+const { ipcRenderer } = require("electron"),
   KEYS = require("../common/constants"),
   setCursorOptions = require("./set_cursor_options.js"),
   setCursorE = document.getElementById("set_cursor"),

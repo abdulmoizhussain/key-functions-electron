@@ -80,7 +80,7 @@ function addNewClipListener(_, arg = "") {
   <button class="button-cp" onclick="copyToClip(${clipHistory.length - 1})">
     <i class="fa fa-copy"></i>
   </button>&nbsp;&nbsp;
-    ${typeof arg == "string" ?
+    ${typeof arg === "string" ?
       escHtml(arg.substr(0, 45)) + (arg.length > 45 ? "...." : "")
       :
       `Image <img src="${arg.icon}" alt="clip-image-thumbnail">`
@@ -99,5 +99,5 @@ function addNewClipListener(_, arg = "") {
 
 function copyToClip(index) {
   const data = clipHistory[parseInt(index)];
-  ipcRenderer.send(KEYS.SET_CLIP, typeof data == "string" ? data : data.index);
+  ipcRenderer.send(KEYS.SET_CLIP, typeof data === "string" ? data : data.index);
 }

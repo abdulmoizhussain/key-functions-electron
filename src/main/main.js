@@ -116,9 +116,6 @@ function checkAndToggle() {
 
   // CLEAN_CLIPBOARD
   // MAINTAIN_CLIPBOARD
-  console.log("_cleanClipButton || _maintainClipButton", _cleanClipButton || _maintainClipButton);
-  console.log("!_clipListenerState", !_clipListenerState);
-  console.log("_maintainClipButton", _maintainClipButton);
   if (_cleanClipButton || _maintainClipButton) {
     if (!_clipListenerState) {
       clipExtended.on("text-changed", manageTextChange);
@@ -143,7 +140,6 @@ function checkAndToggle() {
 }
 
 function manageImageChange() {
-  console.log("manageImageChange");
   const image = clipElectron.readImage("clipboard");
   const icon = image.resize({ width: 16, height: 16 }).toDataURL();
   if (!images.filter(i => i.icon == icon).length) {
@@ -157,11 +153,10 @@ function manageImageChange() {
 }
 
 function manageTextChange() {
-  console.log("manageTextChange");
   // mis https://www.npmjs.com/package/electron-clipboard-extended
   let clipText = clipElectron.readText("clipboard");
   if (_cleanClipButton) {
-    if (clipText.trim().substr(0, 4).toLowerCase() == "mis ") { // must be in start with a space
+    if (clipText.trim().substr(0, 4).toLowerCase() === "mis ") { // must be in start with a space
       clipText = clipText
         .replace(/[^a-zA-Z0-9]+/g, " ")
         .trim()
@@ -180,7 +175,7 @@ function keyUpListener(e) {
 
   // stopping only alphabet characters 65 - 90
   // if (_setCursorButton && e.rawcode > 64 & e.rawcode < 91) {
-  if (_setCursorButton && _keyCodesToExclude.has(e.rawcode) == false) {
+  if (_setCursorButton && !_keyCodesToExclude.has(e.rawcode)) {
     // if (lettersPressed.length == LENGTH) {
     //   lettersPressed.shift();
     // }
@@ -231,12 +226,12 @@ function keyUpListener(e) {
 function keyDownListener(e) {
   // { amount: 3, clicks: 1, direction: 3, rotation: 1, type: 'mousewheel', x: 466, y: 683 }
   if (_controlVolumeButton && e.shiftKey && e.ctrlKey && e.altKey) {
-    if (e.rawcode == 38) { // up key
+    if (e.rawcode === 38) { // up key
       // systemControl.audio.getSystemVolume().then(console.log);
       // winAudio.speaker.set(Math.round((winAudio.speaker.get() + 10) / 10) * 10);
       winAudio.speaker.set(winAudio.speaker.get() + 10);
     }
-    if (e.rawcode == 40) { // down key
+    if (e.rawcode === 40) { // down key
       // winAudio.speaker.set(Math.round((winAudio.speaker.get() - 10) / 10) * 10);
       winAudio.speaker.set(winAudio.speaker.get() - 10);
     }
@@ -244,7 +239,7 @@ function keyDownListener(e) {
 }
 
 ipcMain.on(KEYS.SET_CLIP, function (_, indexOrText) {
-  if (typeof indexOrText == "number") { // an image to copy to clipboard
+  if (typeof indexOrText === "number") { // an image to copy to clipboard
     clipElectron.writeImage(images[indexOrText].image, "clipboard");
   } else { // some text to copy to clipboard
     clipElectron.writeText(indexOrText, "clipboard");

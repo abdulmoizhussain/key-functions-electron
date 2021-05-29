@@ -17,14 +17,14 @@
   },
   "dependencies": {
     "electron": "^13.0.1",
-    "electron-clipboard-extended": "^1.1.1",
-    "iohook": "0.4.0",
-    "robotjs": "^0.5.1",
-    "system-control": "0.0.5",
+    "electron-clipboard-extended": "^22.10.5",
+    "iohook": "^0.9.1",
+    "robotjs": "^0.6.0",
+    "system-control": "^0.1.1",
     "win-audio": "^2.0.2"
   },
   "devDependencies": {
-    "electron-builder": "^21.0.15"
+    "electron-builder": "^22.10.5"
   },
   "iohook": {
     "targets": [
